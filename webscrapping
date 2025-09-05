@@ -1,0 +1,48 @@
+'''
+Title: Web scrapping project
+Name : James Collins Otieno
+Date : 18th May 2025
+'''
+
+#Importing ibraries needed for web Scapping
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+
+#set the URL of website in a variable
+url = 'https://www.scrapethissite.com/pages/forms/'
+page = requests.get(url)
+
+#use BeatifulSoup to extract and print the HTML content
+soup = BeautifulSoup(page.text, 'html')
+print(soup)
+
+#Extract the table with Hockey Score
+hockey_table = soup.find('table',class_='table')
+print(hockey_table)
+
+#Extract the column headings
+table_titles = hockey_table.find_all('th')
+hockey_table_title = [title.text.strip() for title in table_titles]
+print(hockey_table_title)
+
+# save the colunm headings onto a Pandas DataFrame
+df = pd.DataFrame(columns=hockey_table_title)
+df
+
+#Extracting the data row
+column_data = hockey_table.find_all('tr')
+
+#getting all the rows and then looping while stripping and saving data into the Dataframe
+for row in column_data[1:]:
+  row_data = row.find_all('td')
+  individual_row_data = [data.text.strip() for data in row_data]
+##saving each row data as it is generated into the pandas data frame
+  length = len(df)
+  df.loc[length] = individual_row_data
+
+#Inspect the resulting DataFrame
+df
+
+#Save to a .csv file in the current folder
+df.to_csv(r'./Hockey.csv')
